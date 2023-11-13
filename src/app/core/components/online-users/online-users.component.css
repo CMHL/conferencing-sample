@@ -1,0 +1,22 @@
+#online-users {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  width: 500px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  padding:40px;
+}
+
+#online-users .resident {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  width: 300px;
+}
+
+#online-users .resident .resident-info {
+  margin-left: 20px;
+}

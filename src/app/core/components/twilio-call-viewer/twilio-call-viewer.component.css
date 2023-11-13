@@ -1,0 +1,94 @@
+.call-viewer-container {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.call-viewer-container .dial-container  {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.call-viewer-container .dial-container .status-message  {
+  width: 100%;
+  text-align: center;
+}
+
+.call-viewer-container .dial-container .call-buttons {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 20px;
+}
+
+.call-viewer-container .video-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  height: 100%;
+}
+
+.call-viewer-container .video-container #remote-media-container {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  background-color: #555;
+}
+
+.call-viewer-container .video-container #local-media-container {
+  position: absolute;
+  box-sizing: border-box;
+  bottom: 30px;
+  right: 30px;
+  z-index: 2;
+  border-radius: 5px;
+  border: 2px solid #fff;
+  width: 200px;
+  height: 150px;
+  overflow: hidden;
+}
+
+.call-viewer-container .video-container #local-media-container.muted {
+  border: 75px solid #000;
+}
+
+.call-viewer-container .video-container .call-controls {
+  position: absolute;
+  z-index: 3;
+  bottom: 20px;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+}
+
+.call-viewer-container .video-container .call-controls .hang-up-button {
+  color: white;
+  width: 60px;
+  height: 60px;
+  margin: 0 20px;
+  background-color: red;
+}
+
+.call-viewer-container .video-container .call-controls .audio-video-button {
+  color: white;
+  width: 60px;
+  height: 60px;
+  margin: 0 20px;
+}
+
+.call-viewer-container .video-container .call-controls .audio-video-button.enabled {
+  background-color: #03a9f4;
+}
+
+.call-viewer-container .video-container .call-controls .audio-video-button.disabled {
+  background-color: rgb(63, 63, 63);
+}

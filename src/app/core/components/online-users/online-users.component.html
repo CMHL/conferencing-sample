@@ -1,0 +1,13 @@
+
+<div id="online-users" *ngIf="onlineResidents$ | async as onlineResidents">
+    <h3>Online Users</h3>
+    <div *ngFor="let resident of onlineResidents">
+      <div class="resident">
+        <app-avatar-thumbnail [user]="resident"></app-avatar-thumbnail>
+        <div class="resident-info">
+          <a [routerLink]="['call-viewer']" [state]="resident">{{resident.username}}</a>
+        </div>
+      </div>
+    </div>
+</div>
+

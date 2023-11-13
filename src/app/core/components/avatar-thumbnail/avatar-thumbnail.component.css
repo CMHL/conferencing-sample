@@ -1,0 +1,60 @@
+.avatar-thumbnail {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+
+  &.inline {
+    display: inline;
+  }
+
+  &:hover {
+    cursor: pointer;
+  }
+
+  a {
+    outline: none;
+  }
+
+  .avatar {
+    position: relative;
+    margin: 0;
+
+    .presence {
+      display: block;
+      position: absolute;
+      bottom: 0;
+      right: 0;
+    //border: 1px solid #fff;
+      text-align: center;
+      margin: 0;
+      padding: 0;
+      border-radius: 6px;
+      color: #fff;
+      outline: 0;
+      box-shadow: inset -2.5px -2.5px 10px rgba(0, 0, 0, 0.3);
+      background-image: -webkit-linear-gradient(
+        -45deg,
+        rgba(255, 255, 220, 0.3) 0%,
+        transparent 100%
+      );
+      background-image: -ms-linear-gradient(
+        -45deg,
+        rgba(255, 255, 220, 0.3) 0%,
+        transparent 100%
+      );
+
+      &.online {
+        background-color: lawngreen;
+      }
+
+      &.offline {
+        background-color: orangered;
+      }
+    }
+  }
+}
+
+.avatar-thumbnail.inline {
+  display: inline;
+}

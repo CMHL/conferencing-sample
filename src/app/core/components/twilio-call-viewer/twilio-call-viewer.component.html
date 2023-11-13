@@ -1,0 +1,89 @@
+<div class="call-viewer-container">
+  <div class="dial-container" *ngIf="!showVideo">
+    <app-avatar-thumbnail
+      [user]="remoteUser"
+      [hidePresence]="false"
+    ></app-avatar-thumbnail>
+
+    <div class="user-label">
+      <h4>
+        {{ remoteUser.first_name }} {{ remoteUser.last_name }} ({{
+        remoteUser.username
+        }})
+      </h4>
+    </div>
+
+    <div class="call-buttons">
+      <button
+        (click)="requestVideoCall()"
+        *ngIf="!callInProgress"
+      >
+        Video Call
+      </button>
+      <input
+        type="checkbox"
+        name="isrecorded"
+        [checked]="isRecorded"
+        (change)="toggleIsRecorded()"
+        *ngIf="!callInProgress"/>
+        <label for="isrecorded" *ngIf="!callInProgress"> Record</label>
+        <button
+        (click)="endCall()"
+        *ngIf="callInProgress"
+      >
+        Hang Up
+      </button>
+    </div>
+
+    <h3 *ngIf="statusMessage" class="status-message">
+      Status: {{ statusMessage }}
+    </h3>
+    <button
+      (click)="abortCall()"
+    >
+      Back
+    </button>
+  </div>
+
+  <div class="video-container" *ngIf="callInProgress && showVideo">
+    <div #remoteMediaContainer id="remote-media-container"></div>
+    <div
+      #localMediaContainer
+      id="local-media-container"
+      [ngClass]="{ muted: !localVideoEnabled }"
+    ></div>
+
+    <div class="call-controls">
+      <button
+        (click)="toggleLocalAudioMuted()"
+        [ngClass]="{ enabled: localAudioEnabled, disabled: !localAudioEnabled }"
+        class="audio-video-button"
+      >
+        Mute Audio
+      </button>
+
+      <button (click)="endCall()" class="hang-up-button">
+        Hang Up
+      </button>
+
+      <button
+        (click)="toggleLocalVideoMuted()"
+        [ngClass]="{ enabled: localVideoEnabled, disabled: !localVideoEnabled }"
+        class="audio-video-button"
+      >
+        Mute Video
+      </button>
+    </div>
+  </div>
+</div>
+
+<audio #callWaitingSound loop="true">
+  <source src="assets/sounds/on-hold-ringtone.wav" type="audio/wav"/>
+</audio>
+<audio #callAcceptedSound>
+  <source src="assets/sounds/bleep.mp3" type="audio/mp3"/>
+  <source src="assets/sounds/bleep.wav" type="audio/wav"/>
+</audio>
+<audio #callDeclinedSound>
+  <source src="assets/sounds/pling.wav" type="audio/wav"/>
+</audio>

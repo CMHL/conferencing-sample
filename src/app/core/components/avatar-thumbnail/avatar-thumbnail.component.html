@@ -1,0 +1,72 @@
+<div class="avatar-thumbnail">
+  <!-- Avatar available -->
+  <a
+    class="avatar"
+    tabindex="0"
+    *ngIf="user?.avatar_large"
+    (click)="onClicked()"
+  >
+    <img
+      class="avatar"
+      [src]="user.avatar_large"
+      alt="{{ user.first_name }} {{ user.last_name }}"
+      [ngStyle]="{
+        'width.px': size,
+        'height.px': size,
+        'border-radius.px': size
+      }"
+    />
+
+    <i
+      class="presence"
+      *ngIf="!hidePresence"
+      [ngStyle]="{
+        'width.px': size / 3,
+        'height.px': size / 3,
+        'border-radius.px': size / 3,
+        'bottom.px': size / 8
+      }"
+      [ngClass]="{
+        online: (presence$ | async),
+        offline: !(presence$ | async)
+      }"
+    ></i>
+  </a>
+
+  <!-- No Avatar Available -->
+  <a
+    class="avatar no-avatar"
+    [ngStyle]="{ 'width.px': size, 'height.px': size }"
+    tabindex="0"
+    *ngIf="!user?.avatar_large"
+    (click)="onClicked()"
+  >
+    <img
+      class="avatar"
+      src="assets/images/no-avatar.png"
+      alt="{{ user.first_name }} {{ user.last_name }}"
+      [ngStyle]="{
+        'margin.px': 0,
+        'padding.px': 0,
+        'width.px': size,
+        'height.px': size,
+        'border-radius.px': size
+      }"
+    />
+
+    <i
+      class="presence"
+      *ngIf="!hidePresence"
+      [ngStyle]="{
+        'width.px': size / 3,
+        'height.px': size / 3,
+        'border-radius.px': size / 3,
+        'bottom.px': size / 8
+      }"
+      [ngClass]="{
+        online: (presence$ | async),
+        offline: !(presence$ | async)
+      }"
+    ></i>
+  </a>
+</div>
