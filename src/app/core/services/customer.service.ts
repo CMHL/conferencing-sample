@@ -19,12 +19,6 @@ export class CustomerService {
       .pipe(catchError(this.handleError));
   }
 
-  getMyPermissionsOnCustomer(customerId: number) {
-    return this.http
-      .get<string[]>(`${this.endpointUrl}/${customerId}/perms`)
-      .pipe(catchError(this.handleError));
-  }
-
   private extractData(data: any) {
     return data.results || {};
   }

@@ -30,12 +30,6 @@ export class CustomerPresenceService {
           'Customer presence channel subscription succeeded: ' +
           this.channel.name
         );
-        // this.store$.dispatch(
-        //   PusherActions.subscribeCustomerChannelSuccess({
-        //     channelName: this.channel.name,
-        //   })
-        // );
-        // this.store$.dispatch(PresenceActions.getOnlineCustomerUsers());
       }
     );
 
@@ -57,9 +51,7 @@ export class CustomerPresenceService {
         this.logger.info(
           `resident updated over ws: ${JSON.stringify(resident.id)}`
         );
-        // this.store$.dispatch(
-        //   ResidentActions.refreshResidentSuccess({ resident })
-        // );
+        // TODO: Update state with updated resident
       }
     );
 
@@ -74,11 +66,8 @@ export class CustomerPresenceService {
               user.online ? 'online' : 'offline'
             }`
           );
-          // if (user.online) {
-          //   this.store$.dispatch(PresenceActions.customerUserOnline(user));
-          // } else {
-          //   this.store$.dispatch(PresenceActions.customerUserOffline(user));
-          // }
+          // TODO: Update user state with presence status
+
         } else {
           console.warn('uncaught event: ' + event);
         }
