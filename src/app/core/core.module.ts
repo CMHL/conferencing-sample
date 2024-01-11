@@ -14,13 +14,15 @@ import { CallSetupService } from './services/call-setup.service';
 import {PreviousRouteService} from "./services/previous-route.service";
 import { AvatarThumbnailComponent } from './components/avatar-thumbnail/avatar-thumbnail.component';
 import { OnlineUsersComponent } from './components/online-users/online-users.component';
+import { QuadGridComponent } from './components/quad-grid/quad-grid.component';
 
 
 @NgModule({
   declarations: [
     TwilioCallViewerComponent,
     AvatarThumbnailComponent,
-    OnlineUsersComponent
+    OnlineUsersComponent,
+    QuadGridComponent
   ],
   imports: [
     CommonModule,

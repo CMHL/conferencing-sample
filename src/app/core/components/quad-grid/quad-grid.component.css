@@ -1,0 +1,30 @@
+* {
+  padding: 0;
+  margin: 0;
+  box-sizing: border-box;
+}
+
+#quad-wrapper {
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  padding: 0;
+  margin: 0;
+}
+
+video {
+  width: 50%;
+  height: 50%;
+  object-fit: cover;
+  background-color: #000;
+}
+
+iframe {
+  width: 50%;
+  height: 50%;
+  object-fit: cover;
+  background-color: #FFF;
+}

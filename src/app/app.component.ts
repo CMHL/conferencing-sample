@@ -22,7 +22,7 @@ export class AppComponent {
               private customerPresenceService: CustomerPresenceService,
               private conferencingService: ConferencingService) {
     // login as admin
-    this.authService.login('<username>', '<password>').subscribe((response) => {
+    this.authService.login('roger_chatta_admin', 'password').subscribe((response) => {
       console.log(response);
       localStorage.setItem('user', JSON.stringify(response.user));
       localStorage.setItem('token', response.token);
