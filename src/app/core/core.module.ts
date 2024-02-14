@@ -11,10 +11,11 @@ import {ConferencingService} from "./services/conferencing.service";
 import {CustomerPresenceService} from "./services/customer-presence.service";
 import { TwilioCallViewerComponent } from './components/twilio-call-viewer/twilio-call-viewer.component';
 import { CallSetupService } from './services/call-setup.service';
-import {PreviousRouteService} from "./services/previous-route.service";
+import { PreviousRouteService } from "./services/previous-route.service";
 import { AvatarThumbnailComponent } from './components/avatar-thumbnail/avatar-thumbnail.component';
 import { OnlineUsersComponent } from './components/online-users/online-users.component';
 import { QuadGridComponent } from './components/quad-grid/quad-grid.component';
+import { HardwareService } from "./services/hardware.service";
 
 
 @NgModule({
@@ -37,7 +38,8 @@ import { QuadGridComponent } from './components/quad-grid/quad-grid.component';
     ConferencingService,
     CustomerPresenceService,
     CallSetupService,
-    PreviousRouteService
+    PreviousRouteService,
+    HardwareService
   ],
   exports: [
     TwilioCallViewerComponent,

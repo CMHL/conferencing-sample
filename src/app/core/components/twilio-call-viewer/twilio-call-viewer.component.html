@@ -14,19 +14,46 @@
     </div>
 
     <div class="call-buttons">
-      <button
-        (click)="requestVideoCall()"
-        *ngIf="!callInProgress"
-      >
-        Video Call
-      </button>
+
+      <div id="auto-accept-container">
+        <input
+          type="checkbox"
+          name="autoAccept"
+          [checked]="autoAccept"
+          (change)="toggleAutoAccept()"
+          *ngIf="!callInProgress"/>
+        <label for="autoAccept" *ngIf="!callInProgress" style="margin-left: 10px"> Auto Accept</label>
+      </div>
+      <div id="accept-after-container">
+        <label for="acceptAfter" *ngIf="!callInProgress" style="margin-right: 10px">Start Call After </label>
+        <select
+          name="acceptAfter"
+          *ngIf="!callInProgress"
+          (change)="changeAcceptAfter($event)"
+          [attr.disabled] = "autoAccept ? 'disabled' : null">>
+          <option value="0">Call Accepted</option>
+          <option value="5">5 Seconds</option>
+          <option value="10">10 Seconds</option>
+          <option value="15">15 Seconds</option>
+        </select>
+      </div>
+
+      <div id="isrecorded-container">
       <input
         type="checkbox"
         name="isrecorded"
         [checked]="isRecorded"
         (change)="toggleIsRecorded()"
         *ngIf="!callInProgress"/>
-        <label for="isrecorded" *ngIf="!callInProgress"> Record</label>
+        <label for="isrecorded" *ngIf="!callInProgress" style="margin-left: 10px"> Record</label>
+      </div>
+      <button
+        id="video-call-button"
+        (click)="requestVideoCall()"
+        *ngIf="!callInProgress"
+      >
+        Video Call
+      </button>
         <button
         (click)="endCall()"
         *ngIf="callInProgress"

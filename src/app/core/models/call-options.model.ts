@@ -5,4 +5,6 @@ export interface CallOptions {
   declineReason?: string;
   roomName: string;
   roomSid?: string;
+  autoAccept?: boolean;
+  acceptAfter?: number;
 }

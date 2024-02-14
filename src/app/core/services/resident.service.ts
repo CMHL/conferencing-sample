@@ -6,6 +6,7 @@ import {Resident} from "../models/resident.model";
 import {environment} from "../../../environments/environment";
 import {catchError, map, Observable, throwError} from "rxjs";
 
+
 @Injectable({
   providedIn: 'root'
 })
@@ -21,10 +22,14 @@ export class ResidentService {
     params = params.set('customer', customer.id as number);
     return this.http
       .get(this.endpointUrl, { params })
-      .pipe(map(this.extractData), catchError(this.handleError));
+      .pipe(
+        map(this.extractData),
+        catchError(this.handleError)
+      );
   }
 
-  private extractData(data: any) {
+  private extractData(data: any): Resident[] {
+    localStorage.setItem('residents', JSON.stringify(data.results));
     return data.results || {};
   }
 

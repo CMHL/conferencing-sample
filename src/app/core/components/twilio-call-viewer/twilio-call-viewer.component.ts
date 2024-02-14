@@ -16,6 +16,7 @@ import {Nullable, CallType, DeclinedState} from "../../types/types";
 import {CallSetupService} from "../../services/call-setup.service";
 import {PreviousRouteService} from "../../services/previous-route.service";
 import {ConferencingService} from "../../services/conferencing.service";
+import {HardwareService} from "../../services/hardware.service";
 
 
 
@@ -36,6 +37,8 @@ export class TwilioCallViewerComponent implements OnInit {
   localVideoEnabled = true;
   localAudioEnabled = true;
   isRecorded = false;
+  autoAccept: boolean = false;
+  acceptAfter: number = 0;
 
   @Input() callOptions!: CallOptions;
   @Input() remoteUser!: BaseUser;
@@ -53,6 +56,7 @@ export class TwilioCallViewerComponent implements OnInit {
     private router: Router,
     private previousRoute: PreviousRouteService,
     private conferencingService: ConferencingService,
+    private hardwareService: HardwareService
   ) {}
 
   ngOnInit(): void {
@@ -91,6 +95,15 @@ export class TwilioCallViewerComponent implements OnInit {
     this.isRecorded = !this.isRecorded;
   }
 
+  toggleAutoAccept(): void {
+    this.autoAccept = !this.autoAccept;
+  }
+
+  changeAcceptAfter($event: any): void {
+    console.log(`acceptAfter: ${$event.target.value}`);
+    this.acceptAfter = $event.target.value;
+  }
+
   requestAudioCall(): void {
     this.requestCall(true);
   }
@@ -103,17 +116,27 @@ export class TwilioCallViewerComponent implements OnInit {
     audioOnly: boolean,
     enableRecording = this.isRecorded
   ): Promise<void> {
-    this.callOptions = { ...this.callOptions, audioOnly };
-    const room = await this.callSetupService.createRoom(
-      this.callOptions.roomName,
-      enableRecording,
-      audioOnly
-    );
-    this.callInProgress = true;
-    this.statusMessage = 'Calling...';
-    this.callOptions.roomSid = room.sid;
-    this.conferencingService.requestCall(this.callOptions);
-    this.playWaitingSound();
+    this.callOptions = { ...this.callOptions, audioOnly, autoAccept: this.autoAccept, acceptAfter: this.acceptAfter };
+    console.log(`callOptions: ${JSON.stringify(this.callOptions)}`);
+    // Wake screen
+    const residents = localStorage.getItem('residents') ? JSON.parse(localStorage.getItem('residents') as string) : [];
+    const resident = residents.find((resident: any) => resident.username === this.remoteUser.username);
+    this.statusMessage = 'Waking screen...';
+    this.hardwareService.powerNormal(resident.set_top_box.id, true).subscribe( () => {
+      console.log(`Screen powered on for ${resident.username}`);
+      setTimeout(async () => {
+        const room = await this.callSetupService.createRoom(
+          this.callOptions.roomName,
+          enableRecording,
+          audioOnly
+        );
+        this.callInProgress = true;
+        this.statusMessage = 'Calling...';
+        this.callOptions.roomSid = room.sid;
+        this.conferencingService.requestCall(this.callOptions);
+        this.playWaitingSound();
+      }, 1000);
+    });
   }
 
   playWaitingSound(): void {
