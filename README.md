@@ -27,13 +27,18 @@ Requires Node  >= 16
 See [Auth Service](src/app/core/services/auth.service.ts) for example.
 
 Request Type: POST
+
 Content Type: application/json
+
 URL: https://api-demo.caremessenger.co.uk/api-token-auth/
+
 Authentication: None
+
 Body:
 ```json
   {"username": "<your_username>", "password": "<your_password>"}
 ```
+
 Sample Response:
 ```
   {
@@ -68,9 +73,13 @@ Sample Response:
 See [Customer Service](src/app/core/services/customer.service.ts) for example.
 
 Request Type: GET
+
 Content Type: application/json
+
 URL: https://api-demo.caremessenger.co.uk/v2/customer/<customer_id>
+
 Authentication: Authorization header with value of `Bearer <token>`
+
 Sample Response:
 ```json
 {
@@ -103,14 +112,19 @@ Sample Response:
 	"resident_count": 12
 }
 ```
+
 ### 3. Get Online Residents
 
 See [Auth Service](src/app/core/services/resident.service.ts) for example.
 
 Request Type: GET
+
 Content Type: application/json
+
 URL: https://api-demo.caremessenger.co.uk/v2/resident?customer=<customer_id>&online=true
+
 Authentication: Authorization header with value of `Bearer <token>`
+
 Sample Response:
 ``` json
   {
@@ -281,6 +295,7 @@ See [Pusher Service](src/app/core/services/pusher.service.ts) for example.
 ```
 
 ### 5. Subscribe to the presence channel for your customer
+
 ### 6. Subscribe to the conferencing channel for you customer
 
 ```typescript
@@ -304,4 +319,3 @@ See [Pusher Service](src/app/core/services/pusher.service.ts) for example.
     });
 ```
 
-More to follow
