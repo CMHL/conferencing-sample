@@ -2,6 +2,8 @@
 
 This sample Angular application demonstrating how to use the [Chatta API](http://docs.caremessenger.co.uk) to create a video conferencing application.
 
+See [Hierachy Overview](https://docs.caremessenger.co.uk/introduction.html#overview) for an explanation of high level objects.
+
 ### NOTE: This repositroy is a work in progress, please check back for updates.
 
 ## Usage
@@ -253,6 +255,8 @@ Sample Response:
 }
 ```
 
+This response will give you an array of residents who are currently online, store this list of resident's in your client side state container of choice... Redux, localStorage etc.
+
 ### 4. Connect to Pusher
 
 Install the [pusher-js](https://www.npmjs.com/package/pusher-js) library from npm
@@ -296,12 +300,208 @@ See [Pusher Service](src/app/core/services/pusher.service.ts) for example.
 
 ### 5. Subscribe to the presence channel for your customer
 
+See [Customer Presence Service](src/app/core/services/customer-presence.service.ts) from an example
+
+Once we have a connection to pusher, we need to subscribe to the correct channel and events to receive notification of presence events over the websocket.  Whenever any attribute related to a given resident account associated with your customer account changes (including going online/offline), an event will be published over the websocket, it's payload will be the full resident object which you can add/update in your client side state store.
+
+Channel Name: `private-presence-<customer_id>`
+
+Note in this case the channel name starts with the word `private`.  This denotes a channel that requires an authorization check to establish if you are permissioned to subscribe to it.  As such on attempting to subscribe to this channel, a HTTP call will automatically be made to the care messenger API to check authorization.  If authorized, your subscription attempt will be successful.
+
+```typescript
+  public subscribe(customer: Customer) {
+    this.channelName = `private-presence-${customer.id}`;
+    this.channel = this.pusher.subscribe(this.channelName);
+
+    this.pusher.bindChannelEvent(
+      this.channel,
+      'pusher:subscription_succeeded',
+      (channel: Channel) => {
+        this.logger.info(
+          'Customer presence channel subscription succeeded: ' +
+          this.channel.name
+        );
+      }
+    );
+```
+
+Once subscribed to the channel, you now need to bind to the following event
+
+Event Name: `resident_updated`
+
+```typescript
+  this.pusher.bindChannelEvent(
+      this.channel,
+      'resident_updated',
+      (resident: Resident) => {
+        this.logger.info(
+          `resident updated over ws: ${JSON.stringify(resident.id)}`
+        );
+        // TODO: Update resident object in state
+      }
+    );
+```
+
 ### 6. Subscribe to the conferencing channel for you customer
+
+See [Conferencing Service](src/app/core/services/conferencing.service.ts) for an example.
+
+Channel Name: `private-call-<customer_id>`
+
+```typescript
+    subscribe(customer: Customer, user: BaseUser): void {
+    this.channelName = `private-call-${customer.id}`;
+    const channel = this.pusher.subscribe(this.channelName);
+
+    this.pusher.bindChannelEvent(
+      channel,
+      'pusher:subscription_succeeded',
+      (data: any) => {
+        this.logger.info(
+          `Customer call channel subscription succeeded: ${this.channelName}`
+        );
+      }
+    );
+```
+
+This channel we will both subscribe and publish events to.
+
+#### Outbound Events (Publish)
+
+##### Request Call Event
+
+Event Name : `client-conferencing-call-requested-<resident_id>`
+
+Note this event starts with the word `client`, this denotes an event that is sent directly over the websocket to any other parties bound to the same channel, without any interaction or validation with server side API.
+
+The `resident_id` in this event name, is the name of the resident we would like to request an audio/video call with.
+
+When publishing this event, we pass a [CallOptions](src/app/core/models/call-options.model.ts) object as the payload, the interface for this object is as follows
+
+```typescript
+  export interface CallOptions {
+    initiator?: any; // The user requesting the call, could be a Customer Admin or Supporter account
+    target?: any; // The Resident you are requesting a call with
+    audioOnly?: boolean; // set to true to disable video
+    declineReason?: string; // Populated if the target declines the call (call declined, user busy, camera not available etc.)
+    roomName: string; // the name the conferencing room
+    roomSid?: string; // the uuid of the conferencing room
+    autoAccept?: boolean; // if true, the target will not be asked if they want to start the call, screen will be woken remotely and call started without interaction
+    acceptAfter?: number; // if autoAccept === true && acceptAfter > 0, a dialog will be dislayed with acceptAfter seconds countdown before call is started 
+  } 
+```
+
+For example, to request a call with resident
+
+```typescript
+  requestCall(channelName: string, currentUser: BaseUser, resident: Resident): boolean {
+    const callOptions: CallOptions = {
+      initiator: currentUser, // user object returned from login endpoint
+      target: resident, // a resident from online residents call
+      audioOnly: false, // video call
+      autoAccept: false // allow target to accept/decline call via model dialog
+    };
+
+    this.logger.info(`Requesting call with ${callOptions.target.username}`);
+    const eventName = `client-conferencing-call-requested-${callOptions.target.id}`;
+    const channel = this.pusher.channel(this.channelName);
+    return channel.trigger(eventName, callOptions);
+  }
+```
+
+##### Call Ended Event
+
+Event Name: `client-conferencing-call-ended-<resident_id>`
+
+Notify the remote target that you ended (hung up) the call
+
+We publish this event when user wishes to end the call, and therefore needs to notify the target of the action.
+
+```typescript
+  callEnded(channelName: string, callOptions: CallOptions): boolean {
+    const channel = this.pusher.channel(this.channelName);
+    return channel.trigger(
+      'client-conferencing-call-ended-' + callOptions.target.id,
+      callOptions
+    );
+  }
+```
+
+#### Inbound Events (Subscribe)
+
+Inbound events will be triggered after a call request is made, and the intended target has taken some action.
+
+##### Call Accepted Event
+
+Event Name: `client-conferencing-call-accepted-<initiator_id>`
+
+This event will be triggered when either the target explicitly accepts the call, or autoAccept was set in call options and the remote screen starts call setup. 
+
+```typescript
+  // Call accepted inbound event
+  const callAcceptedEventName = `client-conferencing-call-accepted-${initiator.id}`;
+  this.logger.debug(`Listening on ${callAcceptedEventName}`);
+  this.pusher.bindChannelEvent(
+    channel,
+    callAcceptedEventName,
+    (callOptions: CallOptions) => {
+      this.logger.info(`pusher event: call ACCEPTED`);
+      // TODO: propogate this event to any components that need to be notified
+    }
+  );
+```
+
+##### Call Declined Event
+
+Event Name: `client-conferencing-call-declined-<initiator_id>`
+
+Triggered if the target explicitly declined the call, the user was busy, the target screen didn't have the required hardware available, or an exception was thown during call setup. The `declineReason` in `callOptions` will provide detail of why call was declined.  
+
+```typescript
+  // Call declined inbound event
+  const callDeclinedEventName = `client-conferencing-call-declined-${user.id}`;
+  this.logger.debug(`Listening on ${callDeclinedEventName}`);
+  this.pusher.bindChannelEvent(
+    channel,
+    callDeclinedEventName,
+    (callOptions: CallOptions) => {
+      this.logger.info(`pusher event: call DECLINED`);
+      const declineState: DeclinedState = {
+        isDeclined: true,
+        reason: (callOptions.declineReason as string),
+      };
+      // TODO: propogate this event to any components that need to be notified
+    }
+  );
+```
+
+##### Call Ended Event
+
+Event Name: `client-conferencing-call-ended-<initiator_id>`
+
+Triggered when the remote target ends the call
+
+```typescript
+  // Call ended inbound event
+  const callEndedEventName = `client-conferencing-call-ended-${user.id}`;
+  this.logger.debug(`Listening on ${callEndedEventName}`);
+  this.pusher.bindChannelEvent(
+    channel,
+    callEndedEventName,
+    (callOptions: CallOptions) => {
+      this.logger.info(`pusher event: call ENDED`);
+      // TODO: propogate this event to any components that need to be notified
+    }
+  );
+```
+
+## Putting it together 
+
+See [here](src/app/app.component.ts) for how the sample client application triggers this sequence of steps on application load, simply using `localStorage` to store the result of HTTP calls.
 
 ```typescript
     // login as admin
-    this.authService.login('roger_chatta_admin', 'password').subscribe((response) => {
-      console.log(response);
+    this.authService.login('<username>', '<password>').subscribe((response) => {
       localStorage.setItem('user', JSON.stringify(response.user));
       localStorage.setItem('token', response.token);
       // get customer object
@@ -318,4 +518,11 @@ See [Pusher Service](src/app/core/services/pusher.service.ts) for example.
       });
     });
 ```
+
+This sequence of calls initializes the application by authenticating, persisting minimum required state to function, then binding to necessary websocket channels to both listen for and publish events.
+
+At this point we are ready to start building UI elements to allow the user to trigger defined service methods, and react to any inbound events.
+
+See [Call Viewer Component](src/app/core/components/twilio-call-viewer) for an example of how this might be implemented.
+
 
