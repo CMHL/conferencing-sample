@@ -300,7 +300,7 @@ See [Pusher Service](src/app/core/services/pusher.service.ts) for example.
 
 ### 5. Subscribe to the presence channel for your customer
 
-See [Customer Presence Service](src/app/core/services/customer-presence.service.ts) from an example
+See [Customer Presence Service](src/app/core/services/customer-presence.service.ts) for an example
 
 Once we have a connection to pusher, we need to subscribe to the correct channel and events to receive notification of presence events over the websocket.  Whenever any attribute related to a given resident account associated with your customer account changes (including going online/offline), an event will be published over the websocket, it's payload will be the full resident object which you can add/update in your client side state store.
 
