@@ -117,7 +117,7 @@ Sample Response:
 
 ### 3. Get Online Residents
 
-See [Auth Service](src/app/core/services/resident.service.ts) for example.
+See [Resident Service](src/app/core/services/resident.service.ts) for example.
 
 Request Type: GET
 
